@@ -1,0 +1,9 @@
+MNIST_data
+generated
+summaries
+uploaded
+*.pickle
+*.pyc
+data
+tensorboard_data
+old_classifier_data

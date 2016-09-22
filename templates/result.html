@@ -1,0 +1,20 @@
+$def with(has_image, image, label)
+<html>
+<head>
+	<title>result</title>
+</head>
+<body>
+$if has_image:
+    <div align="center">
+		<img src="images/$image">
+		</br>
+		<p style="font-size:30px">$label</p>
+	</div>
+$else:
+    <div align="center">
+		<p style="font-size:30px">no number found in image!</p>
+		</br>
+		<a href="/upload">try again</a>
+	</div>
+</body>
+</html>

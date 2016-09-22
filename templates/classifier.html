@@ -1,0 +1,14 @@
+$def with(form)
+<html>
+<head>
+<title>Ilya Raykin's Number Recognizer</title>
+</head>
+<body>
+<div align="center">
+	<p style="font-size:30px">Upload a picture containing a number!</p>
+	<form method="POST" enctype="multipart/form-data" action="">
+	$:form.render()
+	</form>
+</div>
+</body>
+</html>
