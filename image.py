@@ -48,9 +48,9 @@ def slide_window(image_dim, window_dim, step_x, step_y, skip_range=None):
           yield x_offset, y_offset, right_edge, bottom_edge
 
   
-def draw_bbox(image, bbox):
+def draw_bbox(image, bbox, color="red"):
   draw = ImageDraw.Draw(image)
-  draw.rectangle(bbox, outline="red")
+  draw.rectangle(bbox, outline=color)
 
 
 def bbox_random_shift(image, bbox, shift_percentage):

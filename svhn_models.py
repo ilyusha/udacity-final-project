@@ -128,7 +128,7 @@ def get_svhn_joint_v5():
                             max_epochs        = 25,
                             L2                = True,
                             test_batch_size   = 500,
-                            batch_size        = 250,
+                            batch_size        = 500,
                             save_file         = "svhn_5",
                             name              = "SVHN MultiLogitConvNet classifier")
   return model  

@@ -93,7 +93,7 @@ class SVHNDataSource(DataSource):
   def __init__(self, img_dirs, digit=None, length_only=False, undersample=None, oversample=None):
     self.digit       = digit
     self.length_only = length_only
-    self._filter     = lambda f: "png" in f and "_processed" not in f
+    self._filter     = lambda f: f.endswith('.png')
     self.img_dirs    = img_dirs
     self.oversample_specs  = oversample
     self.undersample_specs = undersample
@@ -116,7 +116,7 @@ class SVHNDataSource(DataSource):
     
 
   def get_test_data(self, batch_size):
-    return SVHNBatchIterator(svhn.TEST_IMAGE_DIR, batch_size, 
+    return SVHNBatchIterator(FLAGS.svhn_test_dir, batch_size, 
                              digit       = self.digit, 
                              length_only = self.length_only,
                              file_filter = self._filter)

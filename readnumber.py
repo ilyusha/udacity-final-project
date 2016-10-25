@@ -52,10 +52,10 @@ def train_svhn_joint_classifier():
   model.train(data)
 
 
-def locate_and_read_number(image, locator_model, classifier_model):
+def locate_and_read_number(image, locator_model, classifier_model, bbox=False):
   '''
   This function locates all potential numbers in an image, run them through the specified
-  classifier, and returns the result with the highest confidence
+  classifier, and returns the longest result with the highest confidence
   '''
   found_numbers = find_number_in_image(locator_model, image, draw_steps=False)
   if not found_numbers:
@@ -65,9 +65,12 @@ def locate_and_read_number(image, locator_model, classifier_model):
       patch = image.crop(bbox)
       prediction, prediction_confidence = classifier_model.classify_image(patch)
       predictions.append((prediction, bbox, prediction_confidence))
-  predictions.sort(key=lambda x: x[2], reverse=True) #sort by confidence
-  best_prediction, bbox, _ = predictions[0]    
-  draw_bbox(image, bbox)
+  max_prediction_length = len(max(predictions, key = lambda x: len(x[0]))[0])
+  acceptable_lengths = (max_prediction_length, max_prediction_length - 1)
+  sorted_by_confidence = sorted([i for i in predictions if len(i[0]) in acceptable_lengths], key = lambda x: x[2], reverse=True)
+  best_prediction, bbox, _ = sorted_by_confidence[0]
+  if bbox:
+    draw_bbox(image, bbox)
   return best_prediction
 
 
@@ -85,7 +88,7 @@ if __name__ == "__main__":
       elif FLAGS.digit:
         train_svhn_digit_classifier(int(FLAGS.digit))
       elif FLAGS.length:
-        train_svhn_length_classifier
+        train_svhn_length_classifier()
     else:
       if FLAGS.joint:
         train_synthetic_joint_classifier()
@@ -97,6 +100,6 @@ if __name__ == "__main__":
     locator_model = get_locator_model()
     number_model  = get_best_svhn_model()
     image = Image.open(FLAGS.classify)
-    print locate_and_read_number(image, locator_model, number_model)
+    print locate_and_read_number(image, locator_model, number_model, bbox=True)
     image.show()
 

@@ -11,6 +11,7 @@ MIN_PATCH_HEIGHT_PIXELS = 10
 ZOOM_PER_STEP = 0.9
 STEP_RELATIVE_TO_PATCH_WIDTH = 0.1
 MIN_CLASSIFIER_CONFIDENCE    = 0.99
+ASPECT_RATIOS = (1, 1.5, 2, 3, 4)
 
 def get_locator_model():
     model = NumberLocator(input_size       = 64 * 64,
@@ -53,7 +54,7 @@ def find_number_in_image(model, orig_image, draw_steps=False):
                 continue
             threads = []
             step = dim * STEP_RELATIVE_TO_PATCH_WIDTH
-            for aspect_ratio in (1,1.5,2.5,3,4):
+            for aspect_ratio in ASPECT_RATIOS:
                 thread = Thread(target=iterate_patches, args=(model, image.copy(), (dim * aspect_ratio, dim), step, step, results_accumulator))
                 threads.append(thread)        
             for thread in threads:

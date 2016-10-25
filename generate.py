@@ -56,7 +56,7 @@ class MNISTImageGenerator(object):
       img_data = random.choice(self._digit_dict[int(s)])
       img_data_array.append(img_data)
     image = self._join_images(img_data_array)
-    if rotate: image = image.rotate(random.randrange(0, 360))
+    if rotate: image = image.rotate(random.randrange(-30, 30))
     return image
 
   @staticmethod

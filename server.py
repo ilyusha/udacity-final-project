@@ -22,6 +22,8 @@ myform = form.Form(form.File("image"), form.Button("submit"))
 number_locator = get_locator_model()
 number_reader  = get_best_svhn_model()
   
+if not os.path.exists(FLAGS.uploaded_img_dir):
+  os.mkdir(FLAGS.uploaded_img_dir)
 
 class Index(object):
 
@@ -61,7 +63,7 @@ class Images(object):
             "jpeg" : "images/jpeg",
             "gif"  : "images/gif",
             }
-    if name in os.listdir("uploaded"):
+    if name in os.listdir(FLAGS.uploaded_img_dir):
       web.header("Content-Type", cType[ext])
       return open(os.path.join(FLAGS.uploaded_img_dir, name), "rb").read()
     else:

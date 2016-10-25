@@ -85,15 +85,15 @@ class ConvNet(base.Model):
         with tf.name_scope("activated"):
           activated = tf.nn.relu(convolution + bias)
 
-        #add dropout if necessary
-        if self.conv_dropout is not None and idx in self.dropout_layers:
-          with tf.name_scope("dropout"):
-            activated = tf.nn.dropout(activated, self.conv_dropout)
+      #add dropout if necessary
+      if self.conv_dropout is not None and idx in self.dropout_layers:
+        with tf.name_scope("dropout"):
+          activated = tf.nn.dropout(activated, self.conv_dropout)
 
-        #add pooling if necessary
-        if idx in self.pooling_layers:
-          with tf.name_scope("max_pool"):
-            activated = self._max_pool(activated)
+      #add pooling if necessary
+      if idx in self.pooling_layers:
+        with tf.name_scope("max_pool"):
+          activated = self._max_pool(activated)
 
       cur_layer = activated
       input_depth = depth
@@ -118,9 +118,9 @@ class ConvNet(base.Model):
           cur_layer = tf.matmul(cur_layer, fc_weight) + fc_bias
         with tf.name_scope("activated"):
           cur_layer = tf.nn.relu(cur_layer)
-        if self.fc_dropout is not None:
-          with tf.name_scope("dropout"):
-            cur_layer = tf.nn.dropout(cur_layer, self.fc_dropout)
+      if self.fc_dropout is not None:
+        with tf.name_scope("dropout"):
+          cur_layer = tf.nn.dropout(cur_layer, self.fc_dropout)
       self.vars_to_save.extend([fc_weight, fc_bias])
       self.l2_vars.extend([fc_weight, fc_bias])
     return cur_layer

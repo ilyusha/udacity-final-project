@@ -182,7 +182,10 @@ class SVHNBatchIterator(FileBatchIterator, SVHNEncoder):
 
   def next_item(self):
     for filename in self.files:
-      img_num = int(filename.split(".")[0])
+      try:
+        img_num = int(filename.split(".")[0])
+      except ValueError:
+        continue #invalid filename
       digits = svhn.get_label(self.dataset_label, img_num)
       if len(digits) > 5: 
         #skip outliers with more than 5 digits
