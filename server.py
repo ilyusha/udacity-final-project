@@ -2,18 +2,17 @@ import web, os
 from cStringIO import StringIO
 from PIL import Image
 from web import form
-from readnumber     import get_best_svhn_model, locate_and_read_number
-from image          import extract_data_from_image
-from inputs.svhn    import process_image_by_file
-from numberlocator  import get_locator_model
-from flags          import FLAGS
+from readnumber       import get_best_svhn_model, locate_and_read_number
+from image            import extract_data_from_image
+from inputs.svhn      import process_image_by_file
+from numberlocator    import get_locator_model
+from flags            import FLAGS
 
 """
 simple web application for reading a number in an uploaded image
 """
 
-urls = ('/',            'Index',
-        '/upload',      'Upload',
+urls = ('/',            'Upload',
         '/images/(.*)', 'Images')
 
 render = web.template.render('templates')
@@ -69,7 +68,8 @@ class Images(object):
     else:
       raise web.notfound()
 
+application = web.application(urls, globals()).wsgifunc()
 
 if __name__ == "__main__":
-  app = web.application(urls, globals())
-  app.run()
+  from werkzeug.serving import run_simple
+  run_simple('0.0.0.0', 8080, application)

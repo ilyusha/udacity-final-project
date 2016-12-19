@@ -1,6 +1,5 @@
 import numpy            as np
 import tensorflow       as tf
-from models.logistic    import LogisticClassifier
 from models.multilayer  import MLP
 from models.convolution import ConvNet, MultiLogitDigitRecognizer
 from flags              import FLAGS
