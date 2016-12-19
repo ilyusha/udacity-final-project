@@ -12,7 +12,10 @@ from flags            import FLAGS
 simple web application for reading a number in an uploaded image
 """
 
-urls = ('/',            'Upload',
+HOME_URI = "/udacity"
+
+urls = ('/',            'Index',
+        HOME_URI,       'Upload',
         '/images/(.*)', 'Images')
 
 render = web.template.render('templates')
@@ -27,7 +30,7 @@ if not os.path.exists(FLAGS.uploaded_img_dir):
 class Index(object):
 
   def GET(self):
-    raise web.seeother("/upload")
+    raise web.seeother(HOME_URI)
     
 class Upload(object):
   
@@ -36,12 +39,12 @@ class Upload(object):
   
 
   def POST(self):
-    form = web.input(image={}, classifiers="")
+    form = web.input(image={})
     imgfile = form['image']
     path = os.path.join(FLAGS.uploaded_img_dir, imgfile.filename)
     f = StringIO()
     if not imgfile.value:
-      raise web.seeother("/upload")
+      raise web.seeother(HOME_URI)
     f.write(imgfile.value)
     image = Image.open(f)
     prediction = locate_and_read_number(image, number_locator, number_reader)

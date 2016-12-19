@@ -18,6 +18,6 @@ flags.DEFINE_bool("svhn", False,      "use SVHN dataset")
 flags.DEFINE_bool("joint", False,     "train multi-logit model")
 flags.DEFINE_integer("digit", False,  "train model for the specified digit position")
 flags.DEFINE_bool("length", False,    "train model on the length of the number")
-flags.DEFINE_string("classify", "",   "classify an image")
+flags.DEFINE_string("run", "",   "read the number anywhere in an image")
 
 FLAGS = flags.FLAGS

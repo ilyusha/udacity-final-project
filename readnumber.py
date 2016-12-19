@@ -93,13 +93,13 @@ if __name__ == "__main__":
       if FLAGS.joint:
         train_synthetic_joint_classifier()
       elif FLAGS.digit:
-        train_synthetic_digit_classifier(FLAGS.digit)
+        train_synthetic_digit_classifier(int(FLAGS.digit))
       elif FLAGS.length:
         train_synthetic_length_classifier()
-  elif FLAGS.classify:
+  elif FLAGS.run:
     locator_model = get_locator_model()
     number_model  = get_best_svhn_model()
-    image = Image.open(FLAGS.classify)
+    image = Image.open(FLAGS.find)
     print locate_and_read_number(image, locator_model, number_model, bbox=True)
     image.show()
 
