@@ -33,20 +33,24 @@ def _get_data(dataset):
   return _data[dataset]
   
 def get_image_data(dataset, img_num):
+  '''get all the metadata for an SVHN image'''
   d = _get_data(dataset)
   labels = ('top', 'left', 'height', 'width', 'label')
   return [d[label][img_num - 1] for label in labels]
 
 def get_label(dataset, img_num):
+  '''return the list of digits in the specified SVHN image'''
   return get_image_data(dataset, img_num)[-1]
 
 def get_digit_bboxes(dataset, img_num):
+  '''return the individual digit bounding box coordinates for the specified image number in the specified dataset'''
   bboxes = []
   for top,left,height,width, _ in zip(*get_image_data(dataset, img_num)):
     bboxes.append((left, top, left+width, top+height))
   return bboxes
 
 def get_bbox(dataset, img_num):
+  '''return the bounding box coordinates for the specified image number in the specified dataset'''
   tops,lefts,heights,widths,_ = get_image_data(dataset, img_num)
   uppermost = min(tops)
   leftmost  = min(lefts)
@@ -55,6 +59,7 @@ def get_bbox(dataset, img_num):
   return leftmost, uppermost, rightmost, tallest
 
 def expand_bbox(bbox, percent_expand):
+  '''utility function to expand a bounding box by the specified amount'''
   left, upper, width, height = bbox
   x_pad  = width * percent_expand
   y_pad  = height * percent_expand
@@ -65,6 +70,7 @@ def expand_bbox(bbox, percent_expand):
   return left, upper, width, height
   
 def process_image(image, img_num, dataset, padding, resize):
+  '''preprocess image by converting it to greyscale, cropping to the bounding box, and resizing'''
   image = image.convert("L")
   bbox = get_bbox(dataset, img_num)
   if padding > 0:
@@ -76,11 +82,13 @@ def process_image(image, img_num, dataset, padding, resize):
     return cropped
 
 def process_image_by_number(dataset, image_dir, img_num, padding=0.3, resize=(64,64)):
+  '''run the specified image through the preprocessing pipeline'''
   img_path = os.path.join(image_dir, str(img_num)+".png")
   img = Image.open(img_path)
   return process_image(img, img_num, dataset, padding, resize)
 
 def process_image_by_file(dataset, path, padding=0.3, resize=(64,64)):
+  '''run the specified image through the preprocessing pipeline'''
   img_dir, filename = os.path.split(path)
   img_num = int(filename.split(".")[0])
   return process_image_by_number(dataset, img_dir, img_num, padding=padding, resize=resize)

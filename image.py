@@ -8,6 +8,7 @@ Module containing some functions for image manipulation
 """
 
 def extract_data_from_image(image):
+  '''return a numpy array containing normalized pixel values for the image'''
   data = np.fromiter(iter(image.getdata()), np.float32)
   data = (data - np.mean(data)) / 255
   return data
@@ -33,6 +34,10 @@ def _filter_steps(iterator, skip_range):
   
 
 def slide_window(image_dim, window_dim, step_x, step_y, skip_range=None):
+  '''function that generates coordinates for a sliding window of the given size, 
+     over the provided image dimensions, given x and y step values.
+     skip_range is an optional parameter in the form of ((x-range), (y-range)) that, if provided,
+     will not overlap with any of the windows'''
   x_img, y_img = image_dim
   x_window, y_window = window_dim
   if not skip_range:
@@ -69,6 +74,7 @@ def bbox_random_shift(image, bbox, shift_percentage):
 
         
 def generate_image_patches(image, window_dim, step_x, step_y, skip_range=None, draw=False):
+  '''function that uses slide_window to iterate over window locations, and crops the image to each window'''
   for i, box in enumerate(slide_window(image.size, window_dim, step_x, step_y, skip_range=skip_range), 1):
     if draw:
       draw_bbox(image, box)

@@ -120,7 +120,7 @@ class MNISTImageGenerator(object):
 def generate_svhn_number(number):
   '''
   Generates an image of the specified number by finding random instances
-  of each digit in the SVHN dataset and stitching them together
+  of each digit in the SVHN dataset and stitching them together.
   '''
   digits = [svhn.get_random_digit(int(digit)) for digit in str(number)]
   num_digits  = len(digits)
@@ -151,7 +151,9 @@ def generate_svhn_number(number):
 
 def generate_random_svhn_composite(num_digits):
   '''
-  Generate a random SVHN-based number with the given number of digits
+  Generate a random SVHN-based number with the given number of digits.
+  This was used to try to balance the dataset with respect to number length,
+  but did not work.
   '''
   number = "".join([str(random.choice(range(10))) for i in range(num_digits)])
   return generate_svhn_number(number), number

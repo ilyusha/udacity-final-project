@@ -12,6 +12,8 @@ from svhn_models        import *
 from synthetic_models   import *
 import sys
 
+'''This module contains helper functions that train various classifier types'''
+
 def get_best_svhn_model():
   '''manually updated - returns the current best SVHN joint model'''
   return get_svhn_joint_v5()
@@ -67,6 +69,10 @@ def locate_and_read_number(image, locator_model, classifier_model, bbox=False):
       predictions.append((prediction, bbox, prediction_confidence))
   max_prediction_length = len(max(predictions, key = lambda x: len(x[0]))[0])
   acceptable_lengths = (max_prediction_length, max_prediction_length - 1)
+  #Select the result with the highest confidence, provided that the number of digits is
+  #within 1 of the longest prediction. This is necessary to weed out scenarios where
+  #the number locator finds a good bounding box for a subset of digits that ends up
+  #resulting in the highest confidence.
   sorted_by_confidence = sorted([i for i in predictions if len(i[0]) in acceptable_lengths], key = lambda x: x[2], reverse=True)
   best_prediction, bbox, _ = sorted_by_confidence[0]
   if bbox:

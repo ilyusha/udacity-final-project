@@ -10,6 +10,7 @@ import numpy      as np
 import tensorflow as tf
 import svhn
 
+'''This module contains BatchIterators, which implement the iterator protocol to generate batched data'''
 
 class BatchIterator(object):
   """

@@ -11,6 +11,9 @@ import numpy       as np
 import tensorflow  as tf
 import svhn
 
+'''This module defines the DataSource abstract class and provides several implementations.
+DataSources expose two methods, get_train_data and get_test_data, that each return BatchIterators (see batch.py).
+DataSource objects are passed to the train() method of base.Model'''
 
 class DataSource(object):
   '''Abstract class used to access train and test BatchIterators'''

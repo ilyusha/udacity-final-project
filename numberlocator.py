@@ -14,6 +14,7 @@ MIN_CLASSIFIER_CONFIDENCE    = 0.99
 ASPECT_RATIOS = (1, 1.5, 2, 3, 4)
 
 def get_locator_model():
+    '''this is the final neural network configuration used for the number locator classifier'''
     model = NumberLocator(input_size       = 64 * 64,
                           fc_layer_sizes    = [1000],
                           fc_keep_prob      = 0.5,
@@ -40,14 +41,18 @@ def find_number_in_image(model, orig_image, draw_steps=False):
     '''recursive algorithm to locate image patches that contain numbers'''
 
     def iterate_patches(model, image, patch_size, step_x, step_y, results_accumulator):
+        '''iterate through image patches using the given patch size and step values,
+           run each patch through the binary classifier, and return patches that 
+           are classified as containing numbers, along with the bounding box and confidence'''
         for bbox, patch in generate_image_patches(image, patch_size, step_x, step_y):
             label, confidence = model.classify_image(patch)
             if label == 1:
                 results_accumulator.append((patch, bbox, confidence))
             
     def find_best_patch(model, image, cur_bbox=None, numbers_found=None):
+        '''actual recursion function'''
         if numbers_found is None: numbers_found = []
-        results_accumulator = []
+        results_accumulator = [] #list that will contain all results at this recursion level
         dim = min(image.size) * ZOOM_PER_STEP
         for i in range(2):
             if dim < max(MIN_PATCH_HEIGHT_PIXELS, orig_image.height * MIN_PATCH_HEIGHT_RELATIVE_TO_IMG):
@@ -60,27 +65,33 @@ def find_number_in_image(model, orig_image, draw_steps=False):
             for thread in threads:
                 thread.start()
                 thread.join()
-            dim = int(dim * .75)
+            dim = int(dim * .75) #optimization: also attempt windows scaled down by 25%.
             if len(results_accumulator) > 0:
                 break
             
         if len(results_accumulator) == 0:
             #base case: no patches left
             return numbers_found
+        #sort found patches by confidence
         results_accumulator.sort(key=lambda x: x[2], reverse=True)
         best_patch, best_bbox, best_confidence = results_accumulator[0]
         if not cur_bbox:
             bbox_absolute_coords = best_bbox
         else:
-            #calculate bounding box relative to original image
+            #calculate bounding box relative to original image. this is necessary because the bbox coordinates returned by 
+            #iterate_patches is relative to best patch from the previous recursion step, not to the original image.
             x_offset, y_offset = cur_bbox[:2]
             bbox_absolute_coords = best_bbox[0] + x_offset, best_bbox[1] + y_offset, best_bbox[2] + x_offset, best_bbox[3] + y_offset
             if draw_steps:
                 print best_confidence
+                #this lets us plot all of the best bounding boxes for all recursion levels
                 draw_bbox(orig_image, bbox_absolute_coords)
         numbers_found.append((bbox_absolute_coords, best_confidence))
         return find_best_patch(model, best_patch, cur_bbox=bbox_absolute_coords, numbers_found=numbers_found)
+
+    #run the recursive function
     found_numbers = find_best_patch(model, orig_image)
+    #drop patches with insufficient confidence
     high_confidence_matches = [bbox for (bbox, confidence) in found_numbers if confidence > MIN_CLASSIFIER_CONFIDENCE]
     #add the entire image to the list as well
     high_confidence_matches.append((0, 0, orig_image.width, orig_image.height))

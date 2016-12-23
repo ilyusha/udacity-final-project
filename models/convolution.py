@@ -62,6 +62,8 @@ class ConvNet(base.Model):
     return output_layer
 
   def add_conv_layers(self, input_layer):
+    '''adds convolutional layers to the network, as well as dropout and pooling'''
+
     reshaped = tf.reshape(input_layer, shape=[-1, self.input_img_dim, self.input_img_dim, 1])
     cur_layer = reshaped
     input_depth = 1
@@ -102,6 +104,7 @@ class ConvNet(base.Model):
     return cur_layer
 
   def add_fc_layers(self, input_layer):
+    '''adds fully-connected layers to the network'''
     #reshape output of last convolution layer to feed it into fully-connected layers
     _, h, w, d = input_layer.get_shape().as_list()
     reshaped_dim = h * w * d
@@ -126,7 +129,7 @@ class ConvNet(base.Model):
     return cur_layer
 
   def add_output_layer(self, input_layer):
-
+    '''adds the output layer to the network'''
     with tf.name_scope("output_layer"):
       with tf.name_scope("weight"):
         out_weight = tf.Variable(tf.truncated_normal([self.fc_layer_sizes[-1], self.num_labels]))
@@ -252,6 +255,7 @@ class MultiLogitDigitRecognizer(ConvNet):
 
     self.logits = self.build_nn(self.X)
     costs = []
+    #define the loss function as the sum of mean cross-entropy for all six logits, adding L2 loss if specified
     with tf.name_scope("loss"):
       for idx,logit in enumerate(self.logits):
         x_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logit, self.Y[:,idx])
@@ -310,7 +314,7 @@ class MultiLogitDigitRecognizer(ConvNet):
     return accuracy
 
   def interpret_accuracy(self, accuracy_tensor, **kwargs):
-    
+
     lengths = accuracy_tensor[:,0]
     correct_predictions = accuracy_tensor[:,1:].astype(bool)
     
@@ -328,10 +332,13 @@ class MultiLogitDigitRecognizer(ConvNet):
       actual_length = row[0]
       return np.all(row[1:actual_length+2])
 
+    #determine whether the predicted number was correct
     all_correct = sum(np.apply_along_axis(_correct_prediction, 1, accuracy_tensor))
     
+    #determine whether the length logit was correct
     correct_length = sum(correct_predictions[:,0])
 
+    #debug statistics: calculate accuracy by digit position, as well as "partial credit"
     correct_by_length = []
     correct_by_digit  = []
     for i in range(1, self.num_logits):
@@ -345,7 +352,6 @@ class MultiLogitDigitRecognizer(ConvNet):
     Overrides default method. Since we are evaluating six logits,
     we run the six predictions sequentially and then average their confidences.
     '''
-
     predictions = []
     confidences = []
     for logit in self.logits:
@@ -383,7 +389,7 @@ class NumberLocator(ConvNet):
       return combined
       
   def interpret_accuracy(self, accuracy_tensor, **kwargs):
-    #unpack columns packed in init_accuracy
+    '''unpack columns packed in init_accuracy and calculate the intermediate results arrays per batch'''
     predicted = accuracy_tensor[0]
     actual    = accuracy_tensor[1]
 
@@ -396,6 +402,7 @@ class NumberLocator(ConvNet):
     return no_number_correct, num_no_number, has_number_correct, num_has_number
 
   def merge_accuracies(self, accuracies, **kwargs):
+    '''combine the batch accuracy data to determine the epoch-level accuracy'''
     epoch = kwargs.get("epoch")
     no_number_correct   = sum(acc[0][0] for acc in accuracies)
     total_no_number     = sum(acc[0][1] for acc in accuracies)
