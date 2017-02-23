@@ -1,5 +1,5 @@
 This project requires the following libraries:
- - Tensorflow 10.0
+ - Tensorflow (at least 0.10.0, but less than 1.0) 
  - PIL
  - web.py
  - werkzeug
